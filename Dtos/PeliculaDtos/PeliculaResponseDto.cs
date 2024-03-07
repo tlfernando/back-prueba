@@ -10,5 +10,9 @@ namespace BackPeliculas.Dtos.PeliculaDto
         public TimeSpan Duracion { get; set; }
         public string? Sinopsis { get; set; }
         public string? ImagenUrl { get; set; }
+        public TimeSpan HoraInicio { get; set; }
+        public TimeSpan HoraFin { get; set; }
+        public int IdSala { get; set; }
+        public List<Sala>? SalasDisponibles { get; set; }
     }
 }

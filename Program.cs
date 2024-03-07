@@ -1,9 +1,13 @@
 using AutoMapper;
+using BackEntradas.Data.Entradas;
 using BackPeliculas.Data;
 using BackPeliculas.Data.Peliculas;
+using BackPeliculas.Data.Salas;
+using BackPeliculas.Data.Usuarios;
 using BackPeliculas.Middleware;
 using BackPeliculas.Models;
 using BackPeliculas.Profiles;
+using BackPeliculas.Token;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -24,18 +28,10 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("SQLServerConnection")!);
 });
 
-//conexion mysql
-// var connectionMySqlString = builder.Configuration.GetConnectionString("MySqlConnection");
-// builder.Services.AddDbContext<AppDbContext>(options =>
-// {
-//     options.UseMySql(connectionMySqlString, ServerVersion.AutoDetect(connectionMySqlString));
-// });
-
-
-
-
 
 builder.Services.AddScoped<IPeliculaRepository, PeliculaRepository>();
+builder.Services.AddScoped<ISalaRepository, SalaRepository>();
+builder.Services.AddScoped<IEntradaRepository, EntradaRepository>();
 
 
 // Add services to the container.
@@ -54,10 +50,36 @@ builder.Services.AddSwaggerGen();
 var mapperConfig = new MapperConfiguration(mc =>
 {
     mc.AddProfile(new PeliculaProfile());
+    mc.AddProfile(new SalaProfile());
+    mc.AddProfile(new EntradaProfile());
 });
 
 IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
+
+
+var builderSecurity = builder.Services.AddIdentityCore<Usuario>();
+var identityBuilder = new IdentityBuilder(builderSecurity.UserType, builder.Services);
+identityBuilder.AddEntityFrameworkStores<AppDbContext>();
+identityBuilder.AddSignInManager<SignInManager<Usuario>>();
+builder.Services.AddSingleton<ISystemClock, SystemClock>();
+builder.Services.AddScoped<IJwtGenerador, JwtGenerador>();
+builder.Services.AddScoped<IUsuarioSesion, UsuarioSesion>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+
+var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Mi palabra secreta"));
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(opt =>
+                {
+                    opt.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = key,
+                        ValidateAudience = false,
+                        ValidateIssuer = false
+                    };
+
+                });
 
 
 builder.Services.AddCors(o => o.AddPolicy("corsapp", builder =>
@@ -91,9 +113,10 @@ using (var ambiente = app.Services.CreateScope())
 
     try
     {
+        var userManager = services.GetRequiredService<UserManager<Usuario>>();
         var context = services.GetRequiredService<AppDbContext>();
         await context.Database.MigrateAsync();
-        await LoadDatabase.InsertarData(context);
+        await LoadDatabase.InsertarData(context, userManager);
 
     }
     catch (Exception e)
@@ -110,3 +133,4 @@ using (var ambiente = app.Services.CreateScope())
 
 
 app.Run();
+

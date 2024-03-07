@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BackPeliculas.Migrations
 {
-    public partial class PrimeraMigracion : Migration
+    public partial class MigracionPelicula : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -62,8 +62,9 @@ namespace BackPeliculas.Migrations
                     Duracion = table.Column<TimeSpan>(type: "time", nullable: false),
                     Sinopsis = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ImagenUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    HoraInicio = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    HoraFin = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    HoraInicio = table.Column<TimeSpan>(type: "time", nullable: false),
+                    HoraFin = table.Column<TimeSpan>(type: "time", nullable: false),
+                    IdSala = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -184,6 +185,7 @@ namespace BackPeliculas.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Capacidad = table.Column<int>(type: "int", nullable: false),
+                    NroEntradas = table.Column<int>(type: "int", nullable: false),
                     PeliculaId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -203,8 +205,7 @@ namespace BackPeliculas.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PeliculaId = table.Column<int>(type: "int", nullable: false),
-                    UsuarioId = table.Column<int>(type: "int", nullable: false),
-                    UsuarioId1 = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    IdUsuario = table.Column<int>(type: "int", nullable: false),
                     SalaId = table.Column<int>(type: "int", nullable: false),
                     HoraInicio = table.Column<DateTime>(type: "datetime2", nullable: false),
                     HoraFin = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -219,17 +220,6 @@ namespace BackPeliculas.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Entradas", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Entradas_AspNetUsers_UsuarioId1",
-                        column: x => x.UsuarioId1,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Entradas_Peliculas_PeliculaId",
-                        column: x => x.PeliculaId,
-                        principalTable: "Peliculas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Entradas_Salas_SalaId",
                         column: x => x.SalaId,
@@ -278,19 +268,9 @@ namespace BackPeliculas.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Entradas_PeliculaId",
-                table: "Entradas",
-                column: "PeliculaId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Entradas_SalaId",
                 table: "Entradas",
                 column: "SalaId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Entradas_UsuarioId1",
-                table: "Entradas",
-                column: "UsuarioId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Salas_PeliculaId",

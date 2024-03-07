@@ -11,6 +11,7 @@ namespace BackPeliculas.Dtos.PeliculaDto
         public string? ImagenUrl { get; set; }
         public DateTime? HoraInicio { get; set; }
         public DateTime? HoraFin { get; set; }
+        public int IdSala { get; set; }
         public List<Sala>? SalasDisponibles { get; set; }
     }
 }

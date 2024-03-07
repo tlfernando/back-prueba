@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace BackPeliculas.Models
+﻿namespace BackPeliculas.Dtos.EntradaDtos
 {
-    public class Entrada
+    public class EntradaResponseDto
     {
         public int Id { get; set; }
         public int PeliculaId { get; set; }

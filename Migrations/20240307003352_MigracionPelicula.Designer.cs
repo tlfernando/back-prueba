@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackPeliculas.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240306013752_PrimeraMigracion")]
-    partial class PrimeraMigracion
+    [Migration("20240307003352_MigracionPelicula")]
+    partial class MigracionPelicula
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -47,6 +47,9 @@ namespace BackPeliculas.Migrations
                     b.Property<DateTime>("HoraInicio")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("IdUsuario")
+                        .HasColumnType("int");
+
                     b.Property<string>("Nombres")
                         .HasColumnType("nvarchar(max)");
 
@@ -65,19 +68,9 @@ namespace BackPeliculas.Migrations
                     b.Property<string>("TipoDocumento")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UsuarioId1")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("PeliculaId");
-
                     b.HasIndex("SalaId");
-
-                    b.HasIndex("UsuarioId1");
 
                     b.ToTable("Entradas");
                 });
@@ -96,11 +89,14 @@ namespace BackPeliculas.Migrations
                     b.Property<string>("Genero")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("HoraFin")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan>("HoraFin")
+                        .HasColumnType("time");
 
-                    b.Property<DateTime?>("HoraInicio")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan>("HoraInicio")
+                        .HasColumnType("time");
+
+                    b.Property<int>("IdSala")
+                        .HasColumnType("int");
 
                     b.Property<string>("ImagenUrl")
                         .HasColumnType("nvarchar(max)");
@@ -129,6 +125,9 @@ namespace BackPeliculas.Migrations
 
                     b.Property<string>("Nombre")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NroEntradas")
+                        .HasColumnType("int");
 
                     b.Property<int?>("PeliculaId")
                         .HasColumnType("int");
@@ -349,27 +348,11 @@ namespace BackPeliculas.Migrations
 
             modelBuilder.Entity("BackPeliculas.Models.Entrada", b =>
                 {
-                    b.HasOne("BackPeliculas.Models.Pelicula", "Pelicula")
-                        .WithMany()
-                        .HasForeignKey("PeliculaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BackPeliculas.Models.Sala", "Sala")
+                    b.HasOne("BackPeliculas.Models.Sala", null)
                         .WithMany("EntradasDisponibles")
                         .HasForeignKey("SalaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("BackPeliculas.Models.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId1");
-
-                    b.Navigation("Pelicula");
-
-                    b.Navigation("Sala");
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("BackPeliculas.Models.Sala", b =>
